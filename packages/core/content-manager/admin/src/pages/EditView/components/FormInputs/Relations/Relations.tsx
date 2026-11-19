@@ -752,7 +752,10 @@ const RelationModalWithContext = ({
 
   React.useLayoutEffect(() => {
     setTextValue('');
-  }, [fieldValue]);
+    setSearchParams((current) =>
+      current._q === '' && current.page === 1 ? current : { ...current, _q: '', page: 1 }
+    );
+  }, [fieldValue, setSearchParams]);
 
   const handleSearch = async (search: string) => {
     setSearchParams((s) => ({ ...s, _q: search, page: 1 }));
@@ -797,8 +800,11 @@ const RelationModalWithContext = ({
           }
           hasMoreItems={hasNextPage}
           loading={isLoadingSearchRelations || isLoadingPermissions}
-          onOpenChange={() => {
-            handleSearch(textValue ?? '');
+          onOpenChange={(isOpen) => {
+            if (isOpen) {
+              setTextValue('');
+              handleSearch('');
+            }
           }}
           noOptionsMessage={() =>
             formatMessage({
